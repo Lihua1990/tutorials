@@ -1,0 +1,61 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="container">
+
+    <div class="col-lg-4">
+    <h2>Steps: </h2>
+
+    <p>1. Read the <a href="https://scvelo.readthedocs.io/">scVelo tutorial</a> carefully to understand RNA velocity. </p>
+
+    <p>2. Prepare the input data for scVelo. Using <a href="http://velocyto.org/velocyto.py/tutorial/cli.html">velocyto</a> or <a href="https://linnarssonlab.org/loompy/kallisto/index.html">loompy/kallisto</a> </p>
+    Using velocyto. Install velocyto according to <a href="http://velocyto.org/velocyto.py/install/index.html#install">this instruction</a>. 
+
+    Then run the following bash script to prepare from your .bam files into .loom files.
+    <pre><code>
+        #!/bin/bash/
+        cd /home/big/lihua/data/ref_data
+        source activate your_virtual_env
+        velocyto run -b /directory/to/barcodes.tsv -o /output/directory -m mm10_rmsk.gtf /directory/to/possorted_genome_bam.bam ./refdata-gex-mm10-2020-A/genes/genes.gtf
+    </code></pre>
+
+    Using loompy. Prepare from your .fastq files into .loom files. Please refer to the above loompy link.
+
+    <p>3. Create your own virtual environment (if using conda, refer to <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">this</a>), then install scvelo using `pip install -U scvelo`, other installation refere to <a href="https://scvelo.readthedocs.io/installation/">this</a>.</p>
+
+    <p>4. Prepare the analyzed data (from R Seurat object) to the file format that can be read into Python. Refer to <a href="https://mojaveazure.github.io/seurat-disk/articles/convert-anndata.html">this instruction</a>.</p>
+    <pre><code>
+        #!usr/bin/R
+        library(Seurat)
+        library(SeuratData)
+        library(SeuratDisk)
+        SaveH5Seurat(your_seurat_object, filename = "save_filename.h5Seurat")
+        Convert("save_filename.h5Seurat", dest = "h5ad")
+    
+    </code></pre>
+    Then you should have the file (save_filename.h5ad) that can be read into Python using scanpy or scvelo.
+    
+    <p>5. From here on you can use all the prepared files to do RNA velocity analysis in Python according to the <a href="https://scvelo.readthedocs.io/getting_started/">tutorial</a>.</p>
+
+    <p>6. If you have multiple .loom files and need to merge them into one file. Refer to <a href="http://velocyto.org/velocyto.py/tutorial/cli.html#merging-multiple-samples-lanes-in-a-single-file">this</a>.</p>
+    <pre><code>
+        #!usr/bin/Python
+        loompy.combine(files, output_filename, key="Accession")
+
+        # or if you want more control on the exact memory that is allocated or subset your data before merging you can do something like:
+        files = ["file1.loom","file2.loom","file3.loom","file4.loom"]
+        # on the command line do: cp file1.loom merged.loom
+        ds = loompy.connect("merged.loom")
+        for fn in files[1:]:
+            ds.add_loom(fn, batch_size=1000)
+    </code></pre>
+
+    https://github.com/theislab/scvelo/issues/36
+    https://github.com/theislab/scvelo/issues/263
+
+
+
+    </div>
+</div>
+{% endblock %}
