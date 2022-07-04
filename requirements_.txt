@@ -47,7 +47,7 @@ jinja2-time==0.2.0
 Mako==1.2.1
 MarkupSafe==2.1.1
 marshmallow==3.17.0
-mccabe==0.6.1
+mccabe==0.7.0
 mypy-extensions==0.4.3
 packaging==21.3
 pathspec==0.9.0
